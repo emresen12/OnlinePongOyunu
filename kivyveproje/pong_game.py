@@ -1,3 +1,5 @@
+import json
+
 import pygame
 import sys
 
@@ -117,9 +119,33 @@ while running:
     if ball.right >= WIDTH:
         left_score += 1
         reset_ball()
+    file="keep_score.json"
+    if left_score >= 3 or right_score >= 3:
+        winner = "Left Player" if left_score >= 10 else "Right Player"
+        with open(file,"r",encoding="utf-8") as f:
+            scores=json.load(f)
+        if winner=="Left Player":
+            scores["player1"] +=1
+        elif winner=="Right Player":
+            scores["player2"] +=1
+        with open(file,"w",encoding="utf-8") as f:
+            json.dump(scores,f,ensure_ascii=False,indent=4)
+
+        SCREEN.fill(BLACK)
+        font_big = pygame.font.SysFont("Arial", 72)
+        winner_text = font_big.render(f"Winner: {winner}", True, WHITE)
+        SCREEN.blit(winner_text,
+                    (WIDTH // 2 - winner_text.get_width() // 2, HEIGHT // 2 - winner_text.get_height() // 2))
+        pygame.display.flip()
+
+        # 3 saniye bekle
+        pygame.time.delay(1000)
+        pygame.quit()
+        sys.exit()
 
     # Ekranı temizle
     SCREEN.fill(BLACK)
+
 
     draw_glow_border(SCREEN, BORDER_COLOR)
     draw_glow_paddle(SCREEN, left_paddle, LEFT_PADDLE_COLOR, LEFT_GLOW)
